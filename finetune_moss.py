@@ -248,6 +248,8 @@ def train(args):
     global_step = 0
     metric = SFTMetric(device=torch.cuda.current_device())
     print(torch.cuda.current_device())
+    args.local_rank = torch.cuda.current_device()
+    args.zero_stagem = 3
 
     model.train()
     for epoch in range(args.n_epochs):
@@ -303,16 +305,16 @@ def train(args):
             if global_step % args.save_step == 0 :
                 # model.save_checkpoint(args.output_dir, global_step)
                 save_zero_three_model(model,
-                                      args.global_rank,
+                                      args.local_rank,
                                       args.output_dir,
-                                      zero_stage=args.zero_stage)
+                                      zero_stage=args.zero_stagem)
 
     if global_step % args.save_step != 0 :
         # model.save_checkpoint(args.output_dir, global_step)
         save_zero_three_model(model,
-                              args.global_rank,
+                              args.local_rank,
                               args.output_dir,
-                              zero_stage=args.zero_stage)
+                              zero_stage=args.zero_stagem)
 
 
 if __name__ == '__main__':
