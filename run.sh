@@ -3,7 +3,7 @@ num_processes=$((num_machines * 6))
 machine_rank=0
 
 accelerate launch \
-	--config_file ./configs/sft.yaml \
+	--config_file ./sft.yaml \
 	--num_processes $num_processes \
 	--num_machines $num_machines \
 	--machine_rank $machine_rank \
