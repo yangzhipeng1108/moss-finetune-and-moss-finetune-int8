@@ -10,7 +10,7 @@ accelerate launch \
 	--deepspeed_multinode_launcher standard finetune_moss.py \
 	--model_name_or_path fnlp/moss-moon-003-sft-plugin \
 	--data_dir ./data \
-	--output_dir ./ckpts/moss-moon-003-sft \
+	--output_dir ./fnlp/moss-moon-003-sft \
 	--log_dir ./train_logs/moss-moon-003-sft \
 	--n_epochs 3 \
 	--train_bsz_per_gpu 1 \
