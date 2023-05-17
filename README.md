@@ -9,3 +9,6 @@ num_machines=1   机器数
 
 num_processes=$((num_machines * 6))  单机器显卡数
 
+# 推理 inference
+
+python moss_inference.py
