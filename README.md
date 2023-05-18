@@ -12,3 +12,12 @@ num_processes=$((num_machines * 6))  单机器显卡数
 # 推理 inference
 
 python moss_inference.py
+
+
+# 网页Demo
+
+## Gradio
+
+基于Gradio的网页Demo，您可以运行本仓库中的web_demo.py：
+
+python web_demo.py
