@@ -165,7 +165,7 @@ def train(args):
     # Remember you still need to do gradient accumulation by yourself, just like you would have done without deepspeed
     # deepspeed_plugin = DeepSpeedPlugin(zero_stage=3, gradient_accumulation_steps=1)
     # deepspeed_plugin.deepspeed_config['train_micro_batch_size_per_gpu'] = 2
-    accelerator = Accelerator(mixed_precision='bf16')
+    accelerator = Accelerator(mixed_precision='bf16') 
 
     if accelerator.is_main_process:
         writer = SummaryWriter(args.log_dir)
@@ -193,7 +193,8 @@ def train(args):
         },
     ]
 
-    optimizer = torch.optim.AdamW(optimizer_grouped_parameters, lr=args.learning_rate)
+    optimizer = torch.optim.AdamW(optimizer_grouped_parameters, lr=args.learning_rate,eps= 1e-05)
+    print(args.learning_rate)
 
     train_dataset = SFTDataset(args.data_dir, tokenizer)
     train_dataloader = DataLoader(train_dataset, batch_size=args.train_bsz_per_gpu, shuffle=True, drop_last=True, collate_fn=train_dataset.collate_fn)
@@ -203,6 +204,8 @@ def train(args):
 
     num_training_steps = (len(train_dataloader) * args.n_epochs) // accelerator.gradient_accumulation_steps
     lr_scheduler = get_cosine_schedule_with_warmup(optimizer, num_warmup_steps=int(args.warmup_rates * num_training_steps), num_training_steps=num_training_steps)
+    print(int(args.warmup_rates * num_training_steps))
+    print(num_training_steps)
 
     model, optimizer, train_dataloader, val_dataloader, lr_scheduler = accelerator.prepare(model, optimizer, train_dataloader, val_dataloader, lr_scheduler)
 
@@ -226,7 +229,7 @@ def train(args):
             acc, train_loss = metric.get_metric()
 
             accelerator.backward(loss)
-            accelerator.clip_grad_value_(model.parameters(),[0.5])
+            # accelerator.clip_grad_value_(model.parameters(),0.5)
             optimizer.step()
 
             if not accelerator.optimizer_step_was_skipped:
@@ -265,19 +268,19 @@ def train(args):
 
             if global_step % args.save_step == 0 and args.local_rank == 0:
                 # model.save_checkpoint(args.output_dir, global_step)
-                # accelerator.save_state(args.output_dir)
+                accelerator.save_state(args.output_dir)
 
-                accelerator.wait_for_everyone()
-                unwrapped_model = accelerator.unwrap_model(model)
-                accelerator.save(unwrapped_model.state_dict(), args.output_dir)
+                # accelerator.wait_for_everyone()
+                # unwrapped_model = accelerator.unwrap_model(model)
+                # accelerator.save(unwrapped_model.state_dict(), args.output_dir)
 
     if global_step % args.save_step != 0 and args.local_rank == 0: #accelerator.is_main_process
         # model.save_checkpoint(args.output_dir, global_step)
-        # accelerator.save_state(args.output_dir)
+        accelerator.save_state(args.output_dir)
 
-        accelerator.wait_for_everyone()
-        unwrapped_model = accelerator.unwrap_model(model)
-        accelerator.save(unwrapped_model.state_dict(), args.output_dir)
+        # accelerator.wait_for_everyone()
+        # unwrapped_model = accelerator.unwrap_model(model)
+        # accelerator.save(unwrapped_model.state_dict(), args.output_dir)
 
 
 
@@ -298,7 +301,7 @@ if __name__ == '__main__':
     parser.add_argument('--eval_bsz_per_gpu', default=4, type=int)
     parser.add_argument('--weight_decay', default=0.1, type=float)
     parser.add_argument('--learning_rate', default=9e-6, type=float)
-    parser.add_argument('--warmup_rates', default=0.05, type=int)
+    parser.add_argument('--warmup_rates', default=0.06, type=int)
     parser.add_argument('--n_epochs', default=2, type=int)
 
     # Other Args
