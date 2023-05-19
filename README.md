@@ -11,7 +11,7 @@ num_processes=$((num_machines * 6))  单机器显卡数
 
 # int8 finetune
 
-## accelerator 多卡分布式 finetune
+## accelerate 多卡分布式 finetune
 
 run_int8_acc.sh
 
