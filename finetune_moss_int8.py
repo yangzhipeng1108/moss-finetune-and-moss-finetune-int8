@@ -199,7 +199,7 @@ def train(args):
     ]
 
 
-    optimizer = torch.optim.AdamW(optimizer_grouped_parameters, lr=args.learning_rate)
+    optimizer = torch.optim.AdamW(optimizer_grouped_parameters, lr=args.learning_rate,eps= 0.000015)
 
     train_dataset = SFTDataset(args.data_dir, tokenizer)
     train_sampler = DistributedSampler(train_dataset)
@@ -214,7 +214,7 @@ def train(args):
 
     global_step = 0
     metric = SFTMetric(device=device)
-
+    
     model.train()
     for epoch in range(args.n_epochs):
         for batch_cnt, (input_ids, attention_mask, labels) in enumerate(train_dataloader):
@@ -225,7 +225,7 @@ def train(args):
             input_ids=input_ids.to(device)
             attention_mask=attention_mask.to(device)
             labels=labels.to(device)
-
+            
             output = model(input_ids=input_ids, attention_mask=attention_mask, labels=labels, return_dict=True)
             loss = output.loss
 
@@ -233,6 +233,7 @@ def train(args):
             acc, train_loss = metric.get_metric()
 
             loss.backward()
+            # torch.nn.utils.clip_grad_value_(model.parameters(),0.5)
             optimizer.step()
             lr_scheduler.step()
 
