@@ -262,11 +262,12 @@ def train(args):
                 model.train()           
 
             if global_step % args.save_step == 0 and args.local_rank == 0:
-                model.save_checkpoint(args.output_dir, global_step)
+                torch.save(model.state_dict(), os.path.join(args.output_dir ,'pytorch_model.bin'))
+
 
     if global_step % args.save_step != 0 and args.local_rank == 0: #accelerator.is_main_process
-        model.save_checkpoint(args.output_dir, global_step)
-
+        torch.save(model.state_dict(), os.path.join(args.output_dir ,'pytorch_model.bin'))
+        
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Args of sft')
