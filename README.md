@@ -15,6 +15,20 @@ num_processes=$((num_machines * 6))  单机器显卡数
 
 run_int8_acc.sh
 
+## 遇到的bug解决方法
+
+1)moss-moon-003-sft-plugin-int8   config.json
+
+  将参数 "wbits": 4, 修改成8
+  
+2)ModuleNotFoundError: No module named 'transformers_modules.local.custom_autotune'
+
+moss 没法把custom_autotune加载到/root/.cache/huggingface/modules/transformers_modules/local/ 下面，你手动把custom_autotune复制到/root/.cache/huggingface/modules/transformers_modules/local/即可
+
+3)moss-moon-003-sft-plugin-int8  quantization.py
+
+265行 transpose_matmul_248_kernel改成trans_matmul_248_kernel
+
 ## torch  DistributedDataParallel 多卡分布式 finetune
 
 run_int8.sh
