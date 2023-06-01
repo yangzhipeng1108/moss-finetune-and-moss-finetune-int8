@@ -262,11 +262,11 @@ def train(args):
                 model.train()           
 
             if global_step % args.save_step == 0 and args.local_rank == 0:
-                torch.save(model.state_dict(), os.path.join(args.output_dir ,'pytorch_model.bin'))
+                torch.save(model.module.state_dict(), os.path.join(args.output_dir ,'pytorch_model.bin'))
 
 
     if global_step % args.save_step != 0 and args.local_rank == 0: #accelerator.is_main_process
-        torch.save(model.state_dict(), os.path.join(args.output_dir ,'pytorch_model.bin'))
+        torch.save(model.module.state_dict(), os.path.join(args.output_dir ,'pytorch_model.bin'))
         
 
 if __name__ == '__main__':
